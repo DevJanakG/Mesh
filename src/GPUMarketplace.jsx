@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { 
   Home,
   BarChart3, 
@@ -40,8 +41,10 @@ import {
   Mail,
   Plus
 } from 'lucide-react';
+import './marketplace.css';
 
 const GPUMarketplace = () => {
+  const navigate = useNavigate('')
   const [activeTab, setActiveTab] = useState('Marketplace');
   const [showSearchDropdown, setShowSearchDropdown] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -519,12 +522,12 @@ const GPUMarketplace = () => {
   };
 
   const navigationItems = [
-    { icon: Home, label: 'Home', active: false },
-    { icon: BarChart2, label: 'Marketplace', active: true },
-    { icon: BarChart3, label: 'Dashboard', active: false },
-    { icon: Wallet, label: 'Wallet', active: false },
-    { icon: History, label: 'History', active: false },
-    { icon: Trophy, label: 'NFTs & Achievements', active: false }
+    { icon: Home, label: 'Home', active: false, link: "/"},
+    { icon: BarChart2, label: 'Marketplace', active: true, link: "/marketplace" },
+    { icon: BarChart3, label: 'Dashboard', active: false, link: "/dashboard" },
+    { icon: Wallet, label: 'Wallet', active: false, link: "/wallet" },
+    { icon: History, label: 'History', active: false, link: "/history" },
+    { icon: Trophy, label: 'NFTs & Achievements', active: false, link: "/rewards" }
   ];
 
   const policiesItems = [
@@ -671,7 +674,7 @@ const GPUMarketplace = () => {
                       ? 'bg-[#2a2a2a] text-white border border-[#3a3a3a]'
                       : 'text-white/60 hover:text-white hover:bg-[#2a2a2a] hover:border hover:border-[#3a3a3a]'
                   }`}
-                  onClick={() => setSidebarOpen(false)}
+                  onClick={() => navigate(item.link)}
                 >
                   <item.icon className="w-5 h-5 mr-3" />
                   {item.label}
@@ -693,7 +696,7 @@ const GPUMarketplace = () => {
               </button>
 
               {/* Community */}
-              <button className="w-full flex items-center px-3 py-2.5 rounded-lg text-sm font-medium text-white/60 hover:text-white hover:bg-[#2a2a2a] transition-all duration-200">
+              <button onClick={()=>navigate('/community')} className="w-full flex items-center px-3 py-2.5 rounded-lg text-sm font-medium text-white/60 hover:text-white hover:bg-[#2a2a2a] transition-all duration-200">
                 <Users className="w-5 h-5 mr-3" />
                 Community
               </button>

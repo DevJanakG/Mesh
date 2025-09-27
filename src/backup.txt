@@ -1,0 +1,797 @@
+
+import React, { useState, useEffect } from 'react';
+import {
+  Wallet, 
+  Send, 
+  Receive,
+  TrendingUp,
+  Copy,
+  ExternalLink,
+  Settings,
+  Bell,
+  Search,
+  Filter,
+  Eye,
+  EyeOff,
+  ChevronDown,
+  ChevronRight,
+  ArrowUpRight,
+  ArrowDownRight,
+  MoreHorizontal,
+  Shield,
+  Zap,
+  Globe,
+  Activity,
+  CreditCard,
+  BarChart3,
+  Clock,
+  CheckCircle2,
+  AlertCircle,
+  Loader2,
+  X,
+  Plus
+} from 'lucide-react';
+
+const WalletDashboard = () => {
+  // State management
+  const [walletAddress, setWalletAddress] = useState(null);
+  const [availableAccounts, setAvailableAccounts] = useState([]);
+  const [errorMessage, setErrorMessage] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
+  const [isConnecting, setIsConnecting] = useState(false);
+  const [isSending, setIsSending] = useState(false);
+  const [balance, setBalance] = useState(null);
+  const [network, setNetwork] = useState(null);
+  const [customAmount, setCustomAmount] = useState('0.5');
+  const [customRecipient, setCustomRecipient] = useState('0xB8CBd37a158b8aC7EFC01751511081D889e42ADf');
+  const [activeView, setActiveView] = useState('overview');
+  const [tokenBalances, setTokenBalances] = useState({});
+  const [transactions, setTransactions] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [showBalance, setShowBalance] = useState(true);
+  const [selectedToken, setSelectedToken] = useState('ETH');
+  const [showSendModal, setShowSendModal] = useState(false);
+
+  // Mock data with enhanced structure
+  const mockTokens = {
+    ETH: { 
+      symbol: 'ETH', 
+      name: 'Ethereum', 
+      decimals: 18, 
+      price: 3245.67,
+      change24h: 2.45,
+      icon: '⟠',
+      color: 'from-purple-500 to-blue-500'
+    },
+    USDC: { 
+      symbol: 'USDC', 
+      name: 'USD Coin', 
+      decimals: 6, 
+      price: 1.00,
+      change24h: 0.01,
+      icon: '💵',
+      color: 'from-blue-500 to-cyan-500'
+    },
+    USDT: { 
+      symbol: 'USDT', 
+      name: 'Tether', 
+      decimals: 6, 
+      price: 1.00,
+      change24h: -0.02,
+      icon: '💰',
+      color: 'from-green-500 to-emerald-500'
+    },
+    BTC: {
+      symbol: 'BTC',
+      name: 'Bitcoin',
+      decimals: 8,
+      price: 64750.23,
+      change24h: 1.85,
+      icon: '₿',
+      color: 'from-orange-500 to-yellow-500'
+    }
+  };
+
+  const mockTransactions = [
+    {
+      id: '0x1a2b3c4d5e6f7890abcdef1234567890abcdef1234567890abcdef1234567890',
+      type: 'send',
+      amount: '0.15',
+      token: 'ETH',
+      status: 'confirmed',
+      timestamp: Date.now() - 3600000,
+      from: walletAddress,
+      to: '0xB8CBd37a158b8aC7EFC01751511081D889e42ADf',
+      gasUsed: '21000'
+    },
+    {
+      id: '0x2b3c4d5e6f7890abcdef1234567890abcdef1234567890abcdef1234567890ab',
+      type: 'receive',
+      amount: '250.00',
+      token: 'USDC',
+      status: 'confirmed',
+      timestamp: Date.now() - 7200000,
+      from: '0xA1B2C3D4E5F6789012345678901234567890ABCD',
+      to: walletAddress,
+      gasUsed: '45000'
+    },
+    {
+      id: '0x3c4d5e6f7890abcdef1234567890abcdef1234567890abcdef1234567890abcd',
+      type: 'swap',
+      amount: '0.05',
+      token: 'BTC',
+      status: 'pending',
+      timestamp: Date.now() - 1800000,
+      from: walletAddress,
+      to: '0xDEF123456789ABCDEF123456789ABCDEF12345678',
+      gasUsed: '65000'
+    }
+  ];
+
+  // Utility functions (keeping core functionality)
+  const getUrlParameter = (name) => {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get(name);
+  };
+
+  const isValidAddress = (address) => {
+    return /^0x[a-fA-F0-9]{40}$/.test(address);
+  };
+
+  const formatAddress = (address) => {
+    if (!address) return '';
+    return `${address.slice(0, 6)}...${address.slice(-4)}`;
+  };
+
+  const formatAmount = (amount, decimals = 4) => {
+    return parseFloat(amount).toFixed(decimals);
+  };
+
+  const formatCurrency = (amount) => {
+    return new Intl.NumberFormat('en-US', {
+      style: 'currency',
+      currency: 'USD'
+    }).format(amount);
+  };
+
+  const copyToClipboard = (text) => {
+    navigator.clipboard.writeText(text);
+    setSuccessMessage('Copied to clipboard!');
+    setTimeout(() => setSuccessMessage(''), 2000);
+  };
+
+  // Core wallet functions (keeping existing logic)
+  useEffect(() => {
+    const amountFromUrl = getUrlParameter('amount');
+    if (amountFromUrl && !isNaN(amountFromUrl) && parseFloat(amountFromUrl) > 0) {
+      setCustomAmount(amountFromUrl);
+    }
+    checkConnection();
+    loadMockData();
+
+    if (window.ethereum) {
+      window.ethereum.on('accountsChanged', handleAccountsChanged);
+      window.ethereum.on('chainChanged', handleChainChanged);
+    }
+
+    return () => {
+      if (window.ethereum) {
+        window.ethereum.removeListener('accountsChanged', handleAccountsChanged);
+        window.ethereum.removeListener('chainChanged', handleChainChanged);
+      }
+    };
+  }, []);
+
+  const loadMockData = () => {
+    const mockBalances = {
+      ETH: '2.4567',
+      USDC: '1,250.50',
+      USDT: '890.25',
+      BTC: '0.08945'
+    };
+    setTokenBalances(mockBalances);
+    setTransactions(mockTransactions);
+  };
+
+  const checkConnection = async () => {
+    if (window.ethereum) {
+      try {
+        const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+        if (accounts.length > 0) {
+          setWalletAddress(accounts[0]);
+          await getBalance(accounts[0]);
+          await getNetwork();
+        }
+      } catch (error) {
+        console.error('Error checking connection:', error);
+      }
+    }
+  };
+
+  const connectWallet = async () => {
+    if (!window.ethereum) {
+      setErrorMessage('MetaMask is not installed. Please install MetaMask extension.');
+      return;
+    }
+
+    setIsConnecting(true);
+    try {
+      const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+      setWalletAddress(accounts[0]);
+      await getBalance(accounts[0]);
+      await getNetwork();
+      setSuccessMessage('Wallet connected successfully!');
+    } catch (error) {
+      if (error.code === 4001) {
+        setErrorMessage('Connection rejected by user');
+      } else {
+        setErrorMessage('Failed to connect wallet');
+      }
+    } finally {
+      setIsConnecting(false);
+    }
+  };
+
+  const handleAccountsChanged = async (accounts) => {
+    if (accounts.length === 0) {
+      setWalletAddress(null);
+      setBalance(null);
+    } else {
+      setWalletAddress(accounts[0]);
+      getBalance(accounts[0]);
+    }
+  };
+
+  const handleChainChanged = () => {
+    window.location.reload();
+  };
+
+  const getBalance = async (address) => {
+    try {
+      const balance = await window.ethereum.request({
+        method: 'eth_getBalance',
+        params: [address, 'latest']
+      });
+      const ethBalance = parseFloat(parseInt(balance, 16) / Math.pow(10, 18)).toFixed(4);
+      setBalance(ethBalance);
+    } catch (error) {
+      console.error('Error getting balance:', error);
+    }
+  };
+
+  const getNetwork = async () => {
+    try {
+      const chainId = await window.ethereum.request({ method: 'eth_chainId' });
+      const networks = {
+        '0x1': 'Ethereum Mainnet',
+        '0xaa36a7': 'Sepolia Testnet',
+        '0x89': 'Polygon Mainnet'
+      };
+      setNetwork(networks[chainId] || `Network ${chainId}`);
+    } catch (error) {
+      console.error('Error getting network:', error);
+    }
+  };
+
+  const sendPayment = async () => {
+    if (!walletAddress) {
+      setErrorMessage('Please connect your wallet first');
+      return;
+    }
+
+    if (!isValidAddress(customRecipient)) {
+      setErrorMessage('Invalid recipient address');
+      return;
+    }
+
+    if (parseFloat(customAmount) <= 0) {
+      setErrorMessage('Amount must be greater than 0');
+      return;
+    }
+
+    setIsSending(true);
+    try {
+      const weiValue = (parseFloat(customAmount) * Math.pow(10, 18)).toString(16);
+      const transactionParameters = {
+        to: customRecipient,
+        from: walletAddress,
+        value: '0x' + weiValue,
+        gas: '0x5208',
+      };
+
+      const txHash = await window.ethereum.request({
+        method: 'eth_sendTransaction',
+        params: [transactionParameters],
+      });
+
+      setSuccessMessage(`Payment sent successfully! Transaction: ${txHash.slice(0, 10)}...`);
+      setShowSendModal(false);
+      setTimeout(() => getBalance(walletAddress), 2000);
+    } catch (error) {
+      if (error.code === 4001) {
+        setErrorMessage('Transaction rejected by user');
+      } else {
+        setErrorMessage('Transaction failed: ' + (error.message || 'Unknown error'));
+      }
+    } finally {
+      setIsSending(false);
+    }
+  };
+
+  const calculateTotalValue = () => {
+    let total = 0;
+    Object.entries(tokenBalances).forEach(([token, balance]) => {
+      const cleanBalance = parseFloat(balance.replace(/,/g, ''));
+      const tokenInfo = mockTokens[token];
+      if (tokenInfo && !isNaN(cleanBalance)) {
+        total += cleanBalance * tokenInfo.price;
+      }
+    });
+    return total;
+  };
+
+  const formatTimeAgo = (timestamp) => {
+    const now = Date.now();
+    const diff = now - timestamp;
+    const minutes = Math.floor(diff / 60000);
+    const hours = Math.floor(diff / 3600000);
+    const days = Math.floor(diff / 86400000);
+
+    if (days > 0) return `${days}d ago`;
+    if (hours > 0) return `${hours}h ago`;
+    if (minutes > 0) return `${minutes}m ago`;
+    return 'Just now';
+  };
+
+  // Navigation items
+  const navItems = [
+    { id: 'overview', label: 'Overview', icon: BarChart3 },
+    { id: 'tokens', label: 'Tokens', icon: Wallet },
+    { id: 'activity', label: 'Activity', icon: Activity },
+    { id: 'nft', label: 'NFTs', icon: CreditCard },
+  ];
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white">
+      {/* Header */}
+      <div className="border-b border-slate-800/50 backdrop-blur-xl bg-slate-900/20">
+        <div className="max-w-7xl mx-auto px-6 py-4">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-4">
+              <div className="flex items-center space-x-3">
+                <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl flex items-center justify-center">
+                  <Wallet size={20} className="text-white" />
+                </div>
+                <div>
+                  <h1 className="text-xl font-bold bg-gradient-to-r from-white to-slate-300 bg-clip-text text-transparent">
+                    CryptoVault
+                  </h1>
+                  <p className="text-xs text-slate-400">Advanced Wallet</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-center space-x-4">
+              <div className="hidden md:flex items-center space-x-2 bg-slate-800/50 rounded-lg px-3 py-2">
+                <Search size={16} className="text-slate-400" />
+                <input
+                  type="text"
+                  placeholder="Search transactions..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="bg-transparent text-sm placeholder-slate-500 outline-none w-48"
+                />
+              </div>
+
+              <button className="p-2 hover:bg-slate-800/50 rounded-lg transition-all">
+                <Bell size={18} className="text-slate-400" />
+              </button>
+
+              <button className="p-2 hover:bg-slate-800/50 rounded-lg transition-all">
+                <Settings size={18} className="text-slate-400" />
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div className="max-w-7xl mx-auto px-6 py-8">
+        <div className="grid grid-cols-12 gap-6">
+          {/* Sidebar Navigation */}
+          <div className="col-span-12 lg:col-span-3">
+            <div className="bg-slate-900/50 backdrop-blur-xl border border-slate-800/50 rounded-2xl p-6">
+              {!walletAddress ? (
+                <div className="space-y-4">
+                  <div className="text-center">
+                    <div className="w-16 h-16 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-xl flex items-center justify-center mx-auto mb-4">
+                      <Shield size={32} className="text-blue-400" />
+                    </div>
+                    <h3 className="text-lg font-semibold mb-2">Connect Wallet</h3>
+                    <p className="text-slate-400 text-sm mb-6">
+                      Connect your wallet to access advanced features
+                    </p>
+                  </div>
+
+                  <button
+                    onClick={connectWallet}
+                    disabled={isConnecting}
+                    className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 disabled:opacity-50 text-white font-medium py-3 px-4 rounded-xl transition-all flex items-center justify-center space-x-2"
+                  >
+                    {isConnecting ? (
+                      <Loader2 size={18} className="animate-spin" />
+                    ) : (
+                      <Wallet size={18} />
+                    )}
+                    <span>{isConnecting ? 'Connecting...' : 'Connect Wallet'}</span>
+                  </button>
+                </div>
+              ) : (
+                <div className="space-y-6">
+                  <div className="text-center pb-4 border-b border-slate-800">
+                    <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full mx-auto mb-3 flex items-center justify-center">
+                      <CheckCircle2 size={20} className="text-white" />
+                    </div>
+                    <p className="text-xs text-slate-400 mb-1">Connected</p>
+                    <p className="font-mono text-sm">{formatAddress(walletAddress)}</p>
+                    <button
+                      onClick={() => copyToClipboard(walletAddress)}
+                      className="mt-2 text-xs text-blue-400 hover:text-blue-300 transition-colors"
+                    >
+                      Copy Address
+                    </button>
+                  </div>
+
+                  <nav className="space-y-2">
+                    {navItems.map((item) => {
+                      const Icon = item.icon;
+                      return (
+                        <button
+                          key={item.id}
+                          onClick={() => setActiveView(item.id)}
+                          className={`w-full flex items-center space-x-3 px-3 py-2.5 rounded-lg transition-all text-left ${
+                            activeView === item.id
+                              ? 'bg-blue-600/20 text-blue-300 border border-blue-600/30'
+                              : 'hover:bg-slate-800/50 text-slate-300'
+                          }`}
+                        >
+                          <Icon size={18} />
+                          <span className="font-medium">{item.label}</span>
+                        </button>
+                      );
+                    })}
+                  </nav>
+
+                  <div className="pt-4 border-t border-slate-800">
+                    <button
+                      onClick={() => setWalletAddress(null)}
+                      className="w-full text-red-400 hover:text-red-300 text-sm font-medium transition-colors"
+                    >
+                      Disconnect
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Main Content */}
+          <div className="col-span-12 lg:col-span-9">
+            {walletAddress ? (
+              <>
+                {/* Portfolio Overview */}
+                {activeView === 'overview' && (
+                  <div className="space-y-6">
+                    {/* Portfolio Value Card */}
+                    <div className="bg-gradient-to-br from-slate-900 to-slate-800 border border-slate-700/50 rounded-2xl p-6 relative overflow-hidden">
+                      <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-blue-500/10 to-purple-500/10 rounded-full blur-3xl"></div>
+                      <div className="relative">
+                        <div className="flex items-center justify-between mb-6">
+                          <div>
+                            <p className="text-slate-400 text-sm mb-1">Total Portfolio Value</p>
+                            <div className="flex items-center space-x-3">
+                              {showBalance ? (
+                                <h2 className="text-3xl font-bold">{formatCurrency(calculateTotalValue())}</h2>
+                              ) : (
+                                <h2 className="text-3xl font-bold">••••••</h2>
+                              )}
+                              <button
+                                onClick={() => setShowBalance(!showBalance)}
+                                className="p-1.5 hover:bg-slate-700/50 rounded-lg transition-all"
+                              >
+                                {showBalance ? <Eye size={18} /> : <EyeOff size={18} />}
+                              </button>
+                            </div>
+                            <div className="flex items-center space-x-2 mt-2">
+                              <TrendingUp size={16} className="text-green-400" />
+                              <span className="text-green-400 text-sm font-medium">+5.67%</span>
+                              <span className="text-slate-400 text-sm">24h</span>
+                            </div>
+                          </div>
+
+                          <div className="flex space-x-3">
+                            <button
+                              onClick={() => setShowSendModal(true)}
+                              className="bg-gradient-to-r from-blue-600 to-blue-500 hover:from-blue-500 hover:to-blue-400 px-6 py-3 rounded-xl font-medium transition-all flex items-center space-x-2"
+                            >
+                              <Send size={18} />
+                              <span>Send</span>
+                            </button>
+                            <button className="bg-slate-700/50 hover:bg-slate-600/50 px-6 py-3 rounded-xl font-medium transition-all flex items-center space-x-2">
+                              <Receive size={18} />
+                              <span>Receive</span>
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* Network Info */}
+                        {network && (
+                          <div className="flex items-center space-x-2 text-sm">
+                            <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                            <span className="text-slate-300">{network}</span>
+                            <Globe size={14} className="text-slate-400" />
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Quick Actions */}
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                      {[
+                        { label: 'Swap', icon: ArrowUpRight, color: 'from-purple-500 to-pink-500' },
+                        { label: 'Stake', icon: Zap, color: 'from-yellow-500 to-orange-500' },
+                        { label: 'Bridge', icon: Globe, color: 'from-green-500 to-teal-500' },
+                        { label: 'DApps', icon: Plus, color: 'from-indigo-500 to-blue-500' }
+                      ].map((action) => {
+                        const Icon = action.icon;
+                        return (
+                          <button
+                            key={action.label}
+                            className="bg-slate-900/50 hover:bg-slate-800/50 border border-slate-800/50 rounded-xl p-4 transition-all group"
+                          >
+                            <div className={`w-10 h-10 bg-gradient-to-r ${action.color} rounded-lg flex items-center justify-center mb-3 group-hover:scale-110 transition-transform`}>
+                              <Icon size={20} className="text-white" />
+                            </div>
+                            <p className="font-medium text-sm">{action.label}</p>
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
+                {/* Token Holdings */}
+                {activeView === 'tokens' && (
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <h2 className="text-xl font-bold">Token Holdings</h2>
+                      <div className="flex space-x-2">
+                        <button className="bg-slate-800/50 hover:bg-slate-700/50 px-4 py-2 rounded-lg text-sm transition-all">
+                          <Filter size={16} />
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="grid gap-4">
+                      {Object.entries(tokenBalances).map(([token, balance]) => {
+                        const tokenInfo = mockTokens[token];
+                        const cleanBalance = parseFloat(balance.replace(/,/g, ''));
+                        const value = cleanBalance * (tokenInfo?.price || 0);
+
+                        return (
+                          <div
+                            key={token}
+                            className="bg-slate-900/50 border border-slate-800/50 rounded-xl p-4 hover:bg-slate-800/30 transition-all cursor-pointer"
+                          >
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center space-x-4">
+                                <div className={`w-12 h-12 bg-gradient-to-r ${tokenInfo?.color || 'from-gray-500 to-gray-600'} rounded-full flex items-center justify-center text-xl`}>
+                                  {tokenInfo?.icon || token[0]}
+                                </div>
+                                <div>
+                                  <h3 className="font-semibold">{tokenInfo?.name || token}</h3>
+                                  <p className="text-slate-400 text-sm">{token}</p>
+                                </div>
+                              </div>
+
+                              <div className="text-right">
+                                <p className="font-semibold">{balance} {token}</p>
+                                <p className="text-slate-400 text-sm">{formatCurrency(value)}</p>
+                                {tokenInfo?.change24h && (
+                                  <p className={`text-sm flex items-center justify-end space-x-1 ${
+                                    tokenInfo.change24h >= 0 ? 'text-green-400' : 'text-red-400'
+                                  }`}>
+                                    <span>{tokenInfo.change24h >= 0 ? '+' : ''}{tokenInfo.change24h}%</span>
+                                  </p>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
+                {/* Transaction History */}
+                {activeView === 'activity' && (
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                      <h2 className="text-xl font-bold">Recent Activity</h2>
+                      <button className="text-blue-400 hover:text-blue-300 text-sm font-medium">
+                        View All
+                      </button>
+                    </div>
+
+                    <div className="space-y-3">
+                      {transactions.map((tx) => {
+                        const tokenInfo = mockTokens[tx.token];
+                        const isOutgoing = tx.type === 'send';
+
+                        return (
+                          <div
+                            key={tx.id}
+                            className="bg-slate-900/50 border border-slate-800/50 rounded-xl p-4 hover:bg-slate-800/30 transition-all"
+                          >
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center space-x-4">
+                                <div className={`w-10 h-10 rounded-full flex items-center justify-center ${
+                                  tx.type === 'send' ? 'bg-red-500/20 text-red-400' :
+                                  tx.type === 'receive' ? 'bg-green-500/20 text-green-400' :
+                                  'bg-blue-500/20 text-blue-400'
+                                }`}>
+                                  {tx.type === 'send' ? <ArrowUpRight size={18} /> :
+                                   tx.type === 'receive' ? <ArrowDownRight size={18} /> :
+                                   <ArrowUpRight size={18} />}
+                                </div>
+                                <div>
+                                  <p className="font-medium capitalize">{tx.type} {tx.token}</p>
+                                  <p className="text-slate-400 text-sm">{formatTimeAgo(tx.timestamp)}</p>
+                                </div>
+                              </div>
+
+                              <div className="text-right">
+                                <p className={`font-semibold ${
+                                  tx.type === 'send' ? 'text-red-400' : 'text-green-400'
+                                }`}>
+                                  {tx.type === 'send' ? '-' : '+'}{tx.amount} {tx.token}
+                                </p>
+                                <div className="flex items-center space-x-2">
+                                  <span className={`px-2 py-1 rounded-full text-xs ${
+                                    tx.status === 'confirmed' ? 'bg-green-500/20 text-green-400' :
+                                    tx.status === 'pending' ? 'bg-yellow-500/20 text-yellow-400' :
+                                    'bg-red-500/20 text-red-400'
+                                  }`}>
+                                    {tx.status}
+                                  </span>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+
+                {/* NFT Placeholder */}
+                {activeView === 'nft' && (
+                  <div className="text-center py-12">
+                    <CreditCard size={48} className="text-slate-600 mx-auto mb-4" />
+                    <h3 className="text-lg font-semibold mb-2">NFT Collection</h3>
+                    <p className="text-slate-400">Your NFTs will appear here</p>
+                  </div>
+                )}
+              </>
+            ) : (
+              <div className="text-center py-12">
+                <Shield size={48} className="text-slate-600 mx-auto mb-4" />
+                <h3 className="text-lg font-semibold mb-2">Wallet Not Connected</h3>
+                <p className="text-slate-400">Connect your wallet to access your portfolio</p>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Send Modal */}
+      {showSendModal && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-md">
+            <div className="flex items-center justify-between p-6 border-b border-slate-700">
+              <h3 className="text-lg font-semibold">Send Transaction</h3>
+              <button
+                onClick={() => setShowSendModal(false)}
+                className="p-1 hover:bg-slate-700 rounded-lg transition-colors"
+              >
+                <X size={20} />
+              </button>
+            </div>
+
+            <div className="p-6 space-y-4">
+              <div>
+                <label className="block text-sm font-medium mb-2">Token</label>
+                <select
+                  value={selectedToken}
+                  onChange={(e) => setSelectedToken(e.target.value)}
+                  className="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500"
+                >
+                  {Object.keys(tokenBalances).map(token => (
+                    <option key={token} value={token}>{token}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-2">Amount</label>
+                <input
+                  type="number"
+                  value={customAmount}
+                  onChange={(e) => setCustomAmount(e.target.value)}
+                  placeholder="0.0"
+                  className="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium mb-2">Recipient Address</label>
+                <input
+                  type="text"
+                  value={customRecipient}
+                  onChange={(e) => setCustomRecipient(e.target.value)}
+                  placeholder="0x..."
+                  className="w-full bg-slate-800 border border-slate-600 rounded-lg px-3 py-2 focus:outline-none focus:border-blue-500 font-mono text-sm"
+                />
+              </div>
+
+              <button
+                onClick={sendPayment}
+                disabled={isSending}
+                className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 disabled:opacity-50 text-white font-medium py-3 rounded-xl transition-all flex items-center justify-center space-x-2"
+              >
+                {isSending ? (
+                  <Loader2 size={18} className="animate-spin" />
+                ) : (
+                  <Send size={18} />
+                )}
+                <span>{isSending ? 'Sending...' : 'Send Transaction'}</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Toast Notifications */}
+      {(errorMessage || successMessage) && (
+        <div className="fixed bottom-4 right-4 z-50">
+          <div className={`p-4 rounded-xl border backdrop-blur-xl ${
+            errorMessage 
+              ? 'bg-red-900/50 border-red-500/50 text-red-200' 
+              : 'bg-green-900/50 border-green-500/50 text-green-200'
+          }`}>
+            <div className="flex items-center space-x-2">
+              {errorMessage ? (
+                <AlertCircle size={18} />
+              ) : (
+                <CheckCircle2 size={18} />
+              )}
+              <span className="text-sm font-medium">
+                {errorMessage || successMessage}
+              </span>
+              <button
+                onClick={() => {
+                  setErrorMessage('');
+                  setSuccessMessage('');
+                }}
+                className="p-1 hover:bg-white/10 rounded transition-colors"
+              >
+                <X size={14} />
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default WalletDashboard;

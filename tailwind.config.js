@@ -19,7 +19,18 @@ export default {
           200: '#8a8a8a',
           100: '#aaaaaa',
           50: '#ffffff'
-        }
+        },
+        'deep-black': '#09090B',
+        'dark-charcoal': '#18181B', 
+        'elevated-gray': '#23232B',
+        'subtle-gray': '#3F3F46',
+        'pure-white': '#F4F4F5',
+        'light-gray': '#D4D4D8',
+        'medium-gray': '#A1A1AA',
+        'success-green': '#10B981',
+        'warning-amber': '#F59E0B',
+        'error-red': '#EF4444',
+        'accent-blue': '#0EA5E9'
       },
       fontFamily: {
         sans: [

@@ -16,7 +16,8 @@ import {
   LifeBuoy,
   LogOut,
   Wallet,
-  History
+  History,
+  HelpCircle
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
@@ -98,6 +99,17 @@ const ProviderDashboard = () => {
 
   // Executive Overview Header Component
   const ExecutiveOverview = () => (
+    <>
+        <div className="flex justify-between items-center mb-1">
+          <div>
+            <h1 className="text-3xl font-bold text-[#F4F4F5]">Dashboard</h1>
+          </div>
+          <div className="flex items-center space-x-4">
+            <button className="p-2 bg-[#18181B] rounded-lg border border-[#3F3F46] hover:border-[#52525B] transition-colors">
+              <HelpCircle className="w-5 h-5 text-[#A1A1AA]" />
+            </button>
+          </div>
+        </div>
     <div className="executive-overview">
       <div className="status-section">
         <div className="provider-status">
@@ -139,6 +151,7 @@ const ProviderDashboard = () => {
         <button className="action-btn">Support</button>
       </div>
     </div>
+    </>
   );
 
   // Financial Performance Cards Component
@@ -726,7 +739,7 @@ const ProviderDashboard = () => {
             </h3>
             <nav className="space-y-1">
               {/* Documentation */}
-              <button className="w-full flex items-center px-3 py-2.5 rounded-lg text-sm font-medium text-white/60 hover:text-white hover:bg-[#2a2a2a] transition-all duration-200">
+              <button onClick={() => navigate("/docs")} className="w-full flex items-center px-3 py-2.5 rounded-lg text-sm font-medium text-white/60 hover:text-white hover:bg-[#2a2a2a] transition-all duration-200">
                 <Book className="w-5 h-5 mr-3" />
                 Documentation
               </button>

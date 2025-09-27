@@ -112,7 +112,7 @@ const HomePage = () => {
                     <div style={{
                         width: '32px',
                         height: '32px',
-                        background: `linear-gradient(135deg, ${theme.colors.primary}, ${theme.colors.secondary})`,
+                       
                         borderRadius: theme.borderRadius.sm,
                         display: 'flex',
                         alignItems: 'center',
@@ -121,7 +121,7 @@ const HomePage = () => {
                         fontWeight: '700',
                         color: '#ffffff'
                     }}>
-                        GPU
+                        <img src="/logo.png" alt="" />
                     </div>
                     <span style={{
                         fontSize: '1.5rem',
@@ -157,14 +157,14 @@ const HomePage = () => {
                         }}>
                            Marketplace
                         </a>
-                        <a href="/wallet" style={{
+                        <a href="/dashboard" style={{
                             color: theme.colors.onSurfaceVariant,
                             textDecoration: 'none',
                             fontSize: '1rem',
                             fontWeight: '500',
                             transition: 'color 0.2s ease'
                         }}>
-                           Wallet
+                           Dashboard
                         </a>
                         <a href="/jobs" style={{
                             color: theme.colors.onSurfaceVariant,
@@ -173,9 +173,35 @@ const HomePage = () => {
                             fontWeight: '500',
                             transition: 'color 0.2s ease'
                         }}>
-                           Jobs
+                           AI Job Submission
                         </a>
-                    
+                        <a href="/wallet" style={{
+                            color: theme.colors.onSurfaceVariant,
+                            textDecoration: 'none',
+                            fontSize: '1rem',
+                            fontWeight: '500',
+                            transition: 'color 0.2s ease'
+                        }}>
+                           Wallet
+                        </a>                 
+                        <a href="/history" style={{
+                            color: theme.colors.onSurfaceVariant,
+                            textDecoration: 'none',
+                            fontSize: '1rem',
+                            fontWeight: '500',
+                            transition: 'color 0.2s ease'
+                        }}>
+                           History
+                        </a>                 
+                        <a href="/rewards" style={{
+                            color: theme.colors.onSurfaceVariant,
+                            textDecoration: 'none',
+                            fontSize: '1rem',
+                            fontWeight: '500',
+                            transition: 'color 0.2s ease'
+                        }}>
+                           NFTs & Achievements
+                        </a>                 
                 </div>
 
                 <div style={{ display: 'flex', gap: '1rem' }}>
@@ -192,7 +218,7 @@ const HomePage = () => {
                     }}>
                         Sign In
                     </button>
-                    <button onClick={()=>navigate('/signin')} style={{
+                    <button onClick={()=>navigate('/jobs')} style={{
                         background: `linear-gradient(135deg, ${theme.colors.primary}, ${theme.colors.primaryDark})`,
                         border: 'none',
                         color: '#ffffff',
@@ -312,7 +338,7 @@ const HomePage = () => {
                         marginBottom: '3rem',
                         flexWrap: 'wrap'
                     }}>
-                        <button style={{
+                        <button onClick={()=>navigate('/marketplace')} style={{
                             background: `linear-gradient(135deg, ${theme.colors.primary}, ${theme.colors.primaryDark})`,
                             border: 'none',
                             color: '#ffffff',
@@ -329,11 +355,11 @@ const HomePage = () => {
                             justifyContent: 'center',
                             gap: '0.5rem'
                         }}>
-                            <span onClick={()=>navigate('/marketplace')}>Start Computing</span>
+                            <span>Start Computing</span>
                             {/* Arrow Right Icon Placeholder */}
                             <span style={{ fontSize: '1.2rem' }}>→</span>
                         </button>
-                        <button style={{
+                        <button onClick={()=>navigate('/dashboard')} style={{
                             background: 'transparent',
                             border: `2px solid ${theme.colors.secondary}`,
                             color: theme.colors.secondary,
@@ -349,7 +375,7 @@ const HomePage = () => {
                             justifyContent: 'center',
                             gap: '0.5rem'
                         }}>
-                            <span onClick={()=>navigate('/marketplace')}>Monetize Your GPU</span>
+                            <span>Monetize Your GPU</span>
                             {/* Dollar Sign Icon Placeholder */}
                             <span style={{ fontSize: '1.2rem' }}>$</span>
                         </button>
@@ -421,7 +447,7 @@ const HomePage = () => {
                             left: 0,
                             right: 0,
                             bottom: 0,
-                            backgroundImage: 'url("/gpu.jpg")',
+                            backgroundImage: 'url("/landing2.jpg")',
                             backgroundSize: 'cover',
                             backgroundRepeat: "no-repeat"
                         }} />
@@ -1872,7 +1898,6 @@ const HomePage = () => {
                             <div style={{
                                 width: '32px',
                                 height: '32px',
-                                background: `linear-gradient(135deg, ${theme.colors.primary}, ${theme.colors.secondary})`,
                                 borderRadius: theme.borderRadius.sm,
                                 display: 'flex',
                                 alignItems: 'center',
@@ -1881,7 +1906,7 @@ const HomePage = () => {
                                 fontWeight: '700',
                                 color: '#ffffff'
                             }}>
-                                GPU
+                                <img src="/logo.png" alt="" />
                             </div>
                             <span style={{
                                 fontSize: '1.5rem',

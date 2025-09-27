@@ -407,7 +407,7 @@ const navigate = useNavigate();
             </h3>
             <nav className="space-y-1">
               {/* Documentation */}
-              <button className="w-full flex items-center px-3 py-2.5 rounded-lg text-sm font-medium text-white/60 hover:text-white hover:bg-[#2a2a2a] transition-all duration-200">
+              <button onClick={() => navigate("/docs")} className="w-full flex items-center px-3 py-2.5 rounded-lg text-sm font-medium text-white/60 hover:text-white hover:bg-[#2a2a2a] transition-all duration-200">
                 <Book className="w-5 h-5 mr-3" />
                 Documentation
               </button>

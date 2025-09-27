@@ -39,7 +39,8 @@ import {
   Phone,
   LifeBuoy,
   Mail,
-  Plus
+  Plus,
+  Bot
 } from 'lucide-react';
 import './marketplace.css';
 
@@ -525,6 +526,7 @@ const GPUMarketplace = () => {
     { icon: Home, label: 'Home', active: false, link: "/"},
     { icon: BarChart2, label: 'Marketplace', active: true, link: "/marketplace" },
     { icon: BarChart3, label: 'Dashboard', active: false, link: "/dashboard" },
+    { icon: Bot, label: "AI Job Submission", active: false, link: "/jobs" },
     { icon: Wallet, label: 'Wallet', active: false, link: "/wallet" },
     { icon: History, label: 'History', active: false, link: "/history" },
     { icon: Trophy, label: 'NFTs & Achievements', active: false, link: "/rewards" }
@@ -690,7 +692,7 @@ const GPUMarketplace = () => {
             </h3>
             <nav className="space-y-1">
               {/* Documentation */}
-              <button className="w-full flex items-center px-3 py-2.5 rounded-lg text-sm font-medium text-white/60 hover:text-white hover:bg-[#2a2a2a] transition-all duration-200">
+              <button onClick={() => navigate("/docs")} className="w-full flex items-center px-3 py-2.5 rounded-lg text-sm font-medium text-white/60 hover:text-white hover:bg-[#2a2a2a] transition-all duration-200">
                 <Book className="w-5 h-5 mr-3" />
                 Documentation
               </button>

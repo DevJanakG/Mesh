@@ -231,12 +231,12 @@ const CommunityPlatform = () => {
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-8">
               <div className="flex items-center space-x-3">
-                <div className="p-2 rounded-lg" style={{ backgroundColor: colors.accent + '20' }}>
-                  <Cpu size={32} style={{ color: colors.accent }} />
+                <div className="p-2 w-16 h-16 rounded-lg">
+                  <img src="/logo.png" alt="" />
                 </div>
                 <div>
                   <h1 className="text-2xl font-bold tracking-tight" style={{ color: colors.textPrimary }}>
-                    ComputeMesh
+                    Mesh
                   </h1>
                   <p className="text-sm font-medium" style={{ color: colors.textMuted }}>
                     Decentralized GPU Community
@@ -983,9 +983,9 @@ const CommunityPlatform = () => {
         <div className="max-w-[1400px] mx-auto px-8 py-12">
           <div className="text-center">
             <div className="flex items-center justify-center space-x-3 mb-4">
-              <Cpu size={28} style={{ color: colors.accent }} />
+              <div><img className='w-8 h-8' src="/logo.png" alt="" /></div>
               <h3 className="text-xl font-bold" style={{ color: colors.textPrimary }}>
-                ComputeMesh Community
+                Mesh Community
               </h3>
             </div>
             <p style={{ color: colors.textMuted }}>

@@ -506,7 +506,7 @@ const Jobs = () => {
               </h3>
               <nav className="space-y-1">
                 {/* Documentation */}
-                <button className="w-full flex items-center px-3 py-2.5 rounded-lg text-sm font-medium text-white/60 hover:text-white hover:bg-[#2a2a2a] transition-all duration-200">
+                <button onClick={() => navigate("/docs")} className="w-full flex items-center px-3 py-2.5 rounded-lg text-sm font-medium text-white/60 hover:text-white hover:bg-[#2a2a2a] transition-all duration-200">
                   <Book className="w-5 h-5 mr-3" />
                   Documentation
                 </button>
@@ -610,17 +610,17 @@ const Jobs = () => {
         {/* Header */}
         <div className="flex justify-between items-center mb-8">
           <div>
-            <div className="flex items-center text-sm text-[#A1A1AA] mb-2">
+            {/* <div className="flex items-center text-sm text-[#A1A1AA] mb-2">
               <span>Dashboard</span>
               <ChevronRight className="w-4 h-4 mx-2" />
               <span>Jobs</span>
               <ChevronRight className="w-4 h-4 mx-2" />
               <span className="text-[#D4D4D8]">Submit New Job</span>
-            </div>
+            </div> */}
             <h1 className="text-3xl font-bold text-[#F4F4F5]">Submit New Job</h1>
           </div>
           <div className="flex items-center space-x-4">
-            <div className="flex items-center space-x-2 px-4 py-2 bg-[#18181B] rounded-lg border border-[#3F3F46]">
+            {/* <div className="flex items-center space-x-2 px-4 py-2 bg-[#18181B] rounded-lg border border-[#3F3F46]">
               <span className="text-sm text-[#A1A1AA]">Step {currentStep} of 5</span>
               <div className="flex space-x-1">
                 {[1, 2, 3, 4, 5].map((step) => (
@@ -632,7 +632,7 @@ const Jobs = () => {
                   />
                 ))}
               </div>
-            </div>
+            </div> */}
             <button className="p-2 bg-[#18181B] rounded-lg border border-[#3F3F46] hover:border-[#52525B] transition-colors">
               <HelpCircle className="w-5 h-5 text-[#A1A1AA]" />
             </button>

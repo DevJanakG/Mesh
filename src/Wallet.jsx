@@ -537,7 +537,7 @@ const navigate = useNavigate();
             </h3>
             <nav className="space-y-1">
               {/* Documentation */}
-              <button className="w-full flex items-center px-3 py-2.5 rounded-lg text-sm font-medium text-white/60 hover:text-white hover:bg-[#2a2a2a] transition-all duration-200">
+              <button onClick={() => navigate("/docs")} className="w-full flex items-center px-3 py-2.5 rounded-lg text-sm font-medium text-white/60 hover:text-white hover:bg-[#2a2a2a] transition-all duration-200">
                 <Book className="w-5 h-5 mr-3" />
                 Documentation
               </button>
@@ -639,7 +639,7 @@ const navigate = useNavigate();
     <div className="min-h-screen w-full bg-[#181A20] flex items-center justify-center p-4">
       <div className="w-full max-w-2xl p-8 bg-[#13151A] rounded-2xl shadow-2xl">
         <div className="flex items-center gap-2 mb-6">
-          <Wallet className="w-6 h-6 text-blue-500" />
+          <Wallet className="w-6 h-6" />
           <h1 className="text-2xl font-bold text-white">MetaMask Wallet</h1>
         </div>
 
@@ -650,7 +650,7 @@ const navigate = useNavigate();
           <button
             onClick={() => setActiveTab('payment')}
             className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-              activeTab === 'payment' ? 'bg-blue-500 text-white' : 'text-gray-400 hover:text-white'
+              activeTab === 'payment' ? 'bg-amber-50 text-black' : 'text-gray-400 hover:text-white'
             }`}
           >
             <Send className="w-4 h-4 inline mr-2" />
@@ -659,7 +659,7 @@ const navigate = useNavigate();
           <button
             onClick={() => setActiveTab('overview')}
             className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-              activeTab === 'overview' ? 'bg-blue-500 text-white' : 'text-gray-400 hover:text-white'
+              activeTab === 'overview' ? 'bg-amber-50 text-black' : 'text-gray-400 hover:text-white'
             }`}
           >
             <Eye className="w-4 h-4 inline mr-2" />
@@ -668,7 +668,7 @@ const navigate = useNavigate();
           <button
             onClick={() => setActiveTab('history')}
             className={`flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors ${
-              activeTab === 'history' ? 'bg-blue-500 text-white' : 'text-gray-400 hover:text-white'
+              activeTab === 'history' ? 'bg-amber-50 text-black' : 'text-gray-400 hover:text-white'
             }`}
           >
             <History className="w-4 h-4 inline mr-2" />
@@ -772,7 +772,7 @@ const navigate = useNavigate();
                 <button
                   onClick={sendPayment}
                   disabled={!walletAddress || isSending}
-                  className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-[#16B364] text-white rounded-lg hover:bg-[#179856] transition-colors font-bold disabled:opacity-60"
+                  className="w-full flex items-center justify-center gap-2 px-4 py-3 bg-amber-50 text-black rounded-lg hover:bg-[#000] hover:text-amber-50 transition-colors font-bold disabled:opacity-60"
                 >
                   {isSending ? (
                     <Loader className="w-4 h-4 animate-spin" />

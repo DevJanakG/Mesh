@@ -10,6 +10,7 @@ import NFTDashboard from './Rewards';
 import ProviderDashboard from './Dashboard'
 import JobHistoryDashboard from './History';
 import CommunityPlatform from './Community';
+import ComputeNetDocsPlatform from './Documentation';
 
 function App() {
   return (
@@ -30,6 +31,8 @@ function App() {
         <Route path='/history' element=  {<JobHistoryDashboard />}>
         </Route>
         <Route path='/community' element=  {<CommunityPlatform />}>
+        </Route>
+        <Route path='/docs' element=  {<ComputeNetDocsPlatform />}>
         </Route>
       </Routes>
     </Router>

@@ -14,14 +14,14 @@ import {
   LifeBuoy,
   LogOut,
   Wallet,
-  History
+  History,
 } from "lucide-react";
 
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 
-function Sidebar() {
-const [sidebarOpen, setSidebarOpen] = useState(false);
+function Sidebar({ type }) {
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const teamRef = useRef(null);
   const [showTeamDropdown, setShowTeamDropdown] = useState(false);
   const [selectedTeam, setSelectedTeam] = useState("Crypto Mining");
@@ -101,7 +101,7 @@ const [sidebarOpen, setSidebarOpen] = useState(false);
   const [showHelpDropdown, setShowHelpDropdown] = useState(false);
   const helpRef = useRef(null);
   return (
-      <>
+    <>
       {sidebarOpen && (
         <div
           className="fixed inset-0 bg-black/50 z-40 lg:hidden"
@@ -214,13 +214,24 @@ const [sidebarOpen, setSidebarOpen] = useState(false);
             </h3>
             <nav className="space-y-1">
               {/* Documentation */}
-              <button className="w-full flex items-center px-3 py-2.5 rounded-lg text-sm font-medium text-white/60 hover:text-white hover:bg-[#2a2a2a] transition-all duration-200">
+              <button onClick={() => navigate("/docs")} className={`w-full flex items-center px-3 py-2.5 rounded-lg text-sm font-medium hover:text-white hover:bg-[#2a2a2a] transition-all duration-200 ${
+                  type === "doc"
+                    ? "bg-[#2a2a2a] text-white border border-[#3a3a3a]"
+                    : "text-white/60"
+                }`}>
                 <Book className="w-5 h-5 mr-3" />
                 Documentation
               </button>
 
               {/* Community */}
-              <button onClick={()=>navigate('/community')} className="w-full flex items-center px-3 py-2.5 rounded-lg text-sm font-medium hover:text-white hover:bg-[#2a2a2a] transition-all duration-200 bg-[#2a2a2a] text-white border border-[#3a3a3a]">
+              <button
+                onClick={() => navigate("/community")}
+                className={`w-full flex items-center px-3 py-2.5 rounded-lg text-sm font-medium hover:text-white hover:bg-[#2a2a2a] transition-all duration-200 ${
+                  type !== "doc"
+                    ? "bg-[#2a2a2a] text-white border border-[#3a3a3a]"
+                    : "text-white/60"
+                }`}
+              >
                 <Users className="w-5 h-5 mr-3" />
                 Community
               </button>
@@ -312,8 +323,8 @@ const [sidebarOpen, setSidebarOpen] = useState(false);
           </div>
         </div>
       </div>
-      </>
-  )
+    </>
+  );
 }
 
 export default Sidebar;

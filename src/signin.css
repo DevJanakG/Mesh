@@ -8,6 +8,10 @@
     align-items: center;
 }
 
+.docSec > * {
+    font-family: Kanit !important;
+}
+
 .jobsSec {
     width: '100vw';
     height: '100vh';
